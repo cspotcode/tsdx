@@ -5,16 +5,10 @@ const rootDir = path.resolve(__dirname, '..');
 
 function main() {
   if (getPackageManager() === 'yarn2') {
-    // TODO we need to trigger loading of exec prior to deleting the node_modules directory.
-    // I don't like this approach; I should change it.
-    // But for now, it lets us test against yarn 2 and address compat issues.
-    shell.exec('npm --version');
-    shell.rm('-rf', path.join(rootDir, 'node_modules'));
     shell.exec('yarn set version 2');
     shell.exec('yarn');
+    shell.rm('-rf', path.join(rootDir, 'node_modules'));
   }
-
-  shell.exec('yarn test:post-build');
 }
 
 // TODO stop duplicating this function in 2x places

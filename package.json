@@ -28,7 +28,7 @@
     "lint:post-build": "node dist/index.js lint ./ --ignore-pattern 'test/e2e/fixtures/lint'",
     "test": "yarn build && yarn test:post-build",
     "test:post-build": "node dist/index.js test",
-    "test:ci": "node ./scripts/test-ci.js",
+    "test:ci": "node ./scripts/test-ci-prepare.js && yarn test:post-build",
     "start": "tsc -p tsconfig.json --watch",
     "release": "np",
     "deduplicate": "yarn-deduplicate -s fewer yarn.lock",
