@@ -28,7 +28,7 @@ jobs:
         run: yarn deduplicate:check
 
   test:
-    name: Test on Node ${{ matrix.node }} and ${{ matrix.os }}
+    name: Test on Node ${{ matrix.node }} and ${{ matrix.os }} using ${{ matrix.package_manager }}
 
     runs-on: ${{ matrix.os }}
     strategy:
