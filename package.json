@@ -97,7 +97,7 @@
     "tiny-glob": "^0.2.6",
     "ts-jest": "^26.4.4",
     "tslib": "^1.9.3",
-    "typescript": "^3.8.3"
+    "typescript": "latest"
   },
   "devDependencies": {
     "@jest/types": "^25.5.0",
