@@ -1,6 +1,6 @@
 import { Config } from '@jest/types';
 import { createRequire } from 'module';
-import * as Path from 'path';
+import * as path from 'path';
 
 export type JestConfigOptions = Partial<Config.InitialOptions>;
 
@@ -8,8 +8,7 @@ export function createJestConfig(
   _: (relativePath: string) => void,
   rootDir: string
 ): JestConfigOptions {
-
-  function resolveRelativeTo (dir: string, moduleSpecifier: string) {
+  function resolveRelativeTo(dir: string, moduleSpecifier: string) {
     const req = createRequire(dir);
     try {
       return req.resolve(moduleSpecifier);
@@ -24,11 +23,19 @@ export function createJestConfig(
   // https://github.com/TypeStrong/ts-node/blob/48fc3903b11921339ea98787ed2d99753e684fd2/src/index.ts#L1219-L1226
   // https://github.com/TypeStrong/ts-node/blob/master/dist-raw/node-createrequire.js
   function resolveBabelJest() {
-    if(createRequire) {
-      const jestLocation = resolveRelativeTo(Path.join(rootDir, 'file.js'), 'jest') || require.resolve('jest');
+    if (typeof createRequire === 'function') {
+      const jestLocation =
+        resolveRelativeTo(path.join(rootDir, 'file.js'), 'jest') ||
+        require.resolve('jest');
       const jestCoreLocation = resolveRelativeTo(jestLocation, '@jest/core')!;
-      const jestConfigLocation = resolveRelativeTo(jestCoreLocation, 'jest-config')!;
-      return resolveRelativeTo(rootDir, 'babel-jest') || resolveRelativeTo(jestConfigLocation, 'babel-jest')!;
+      const jestConfigLocation = resolveRelativeTo(
+        jestCoreLocation,
+        'jest-config'
+      )!;
+      return (
+        resolveRelativeTo(rootDir, 'babel-jest') ||
+        resolveRelativeTo(jestConfigLocation, 'babel-jest')!
+      );
     } else {
       return require.resolve('babel-jest');
     }

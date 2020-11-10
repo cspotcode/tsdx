@@ -15,7 +15,7 @@ export function setupStageWithFixture(
   shell.exec(
     `cp -a ${rootDir}/test/${testDir}/fixtures/${fixtureName}/. ${stagePath}/`
   );
-  if(getPackageManager() === 'npm') {
+  if (getPackageManager() === 'npm') {
     shell.ln(
       '-s',
       path.join(rootDir, 'node_modules'),
@@ -23,7 +23,7 @@ export function setupStageWithFixture(
     );
   }
   shell.cd(stagePath);
-  if(getPackageManager() === 'yarn2') {
+  if (getPackageManager() === 'yarn2') {
     shell.exec(`yarn`);
   }
 }
