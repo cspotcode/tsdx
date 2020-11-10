@@ -9,4 +9,4 @@ package-lock.json
 .netlify
 /.yarn
 /.yarnrc.yml
-
+/.pnp.js
