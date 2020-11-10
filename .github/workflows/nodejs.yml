@@ -48,7 +48,13 @@ jobs:
       - name: Install deps and build (with cache)
         uses: bahmutov/npm-install@v1
 
+      - name: Switch to yarn2 before testing
+        run: rm -rf node_modules && yarn set version 2 && yarn
+        if: ${{ matrix.package_manager == 'yarn2' }}
+        env:
+          TSDX_TEST_PACKAGE_MANAGER: ${{ matrix.package_manager }}
+
       - name: Test package
-        run: yarn test:ci
+        run: yarn test:post-build
         env:
           TSDX_TEST_PACKAGE_MANAGER: ${{ matrix.package_manager }}
