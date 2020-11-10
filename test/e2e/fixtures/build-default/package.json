@@ -3,5 +3,8 @@
     "build": "tsdx build"
   },
   "name": "build-default",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "*"
+  }
 }

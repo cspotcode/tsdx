@@ -17,14 +17,26 @@ export function createJestConfig(
       return null;
     }
   }
-  const jestLocation = resolveRelativeTo(Path.join(rootDir, 'file.js'), 'jest') || require.resolve('jest')
-  const jestCoreLocation = resolveRelativeTo(jestLocation, '@jest/core')!
-  const jestConfigLocation = resolveRelativeTo(jestCoreLocation, 'jest-config')!
-
+  // Temporary hack while this PR is in proof-of-concept phase:
+  // Do not attempt `createRequire` if running old node which does not have it.
+  // If `createRequire` is necessary in final implementation,
+  // we can copy paste a backwards-compatible implementation from here:
+  // https://github.com/TypeStrong/ts-node/blob/48fc3903b11921339ea98787ed2d99753e684fd2/src/index.ts#L1219-L1226
+  // https://github.com/TypeStrong/ts-node/blob/master/dist-raw/node-createrequire.js
+  function resolveBabelJest() {
+    if(createRequire) {
+      const jestLocation = resolveRelativeTo(Path.join(rootDir, 'file.js'), 'jest') || require.resolve('jest');
+      const jestCoreLocation = resolveRelativeTo(jestLocation, '@jest/core')!;
+      const jestConfigLocation = resolveRelativeTo(jestCoreLocation, 'jest-config')!;
+      return resolveRelativeTo(rootDir, 'babel-jest') || resolveRelativeTo(jestConfigLocation, 'babel-jest')!;
+    } else {
+      return require.resolve('babel-jest');
+    }
+  }
   const config: JestConfigOptions = {
     transform: {
       '.(ts|tsx)$': require.resolve('ts-jest/dist'),
-      '.(js|jsx)$': resolveRelativeTo(rootDir, 'babel-jest') || resolveRelativeTo(jestConfigLocation, 'babel-jest')!, // jest's default
+      '.(js|jsx)$': resolveBabelJest(), // jest's default
     },
     transformIgnorePatterns: ['[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$'],
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],

@@ -15,15 +15,25 @@ export function setupStageWithFixture(
   shell.exec(
     `cp -a ${rootDir}/test/${testDir}/fixtures/${fixtureName}/. ${stagePath}/`
   );
-  shell.ln(
-    '-s',
-    path.join(rootDir, 'node_modules'),
-    path.join(stagePath, 'node_modules')
-  );
+  if(getPackageManager() === 'npm') {
+    shell.ln(
+      '-s',
+      path.join(rootDir, 'node_modules'),
+      path.join(stagePath, 'node_modules')
+    );
+  }
   shell.cd(stagePath);
+  if(getPackageManager() === 'yarn2') {
+    shell.exec(`yarn`);
+  }
 }
 
 export function teardownStage(stageName: string): void {
   shell.cd(rootDir);
   shell.rm('-rf', path.join(rootDir, stageName));
+}
+
+function getPackageManager() {
+  if (process.env.TSDX_TEST_PACKAGE_MANAGER === 'yarn2') return 'yarn2';
+  return 'npm';
 }
