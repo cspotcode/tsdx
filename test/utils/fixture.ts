@@ -1,4 +1,5 @@
 import * as path from 'path';
+import * as fs from 'fs';
 import * as shell from 'shelljs';
 
 export const rootDir = process.cwd();
@@ -24,6 +25,9 @@ export function setupStageWithFixture(
   }
   shell.cd(stagePath);
   if (getPackageManager() === 'yarn2') {
+    // Tell yarn to run yarn2 & treat this directory as project root
+    fs.writeFileSync('yarn.lock', '');
+    fs.writeFileSync('.yarnrc.yml', 'yarnPath: ../.yarn/releases/yarn-sources.cjs');
     shell.exec(`yarn`);
   }
 }

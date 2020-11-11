@@ -1,4 +1,6 @@
 import * as shell from 'shelljs';
+import createRequire from 'create-require';
+import * as path from 'path';
 
 import * as util from '../utils/fixture';
 import { execWithCache, grep } from '../utils/shell';
@@ -44,7 +46,7 @@ describe('tsdx build :: zero-config defaults', () => {
   it('should create the library correctly', async () => {
     const output = execWithCache('node ../dist/index.js build');
 
-    const lib = require(`../../${stageName}/dist`);
+    const lib = createRequire(path.resolve(__dirname, `../../${stageName}`))('./dist');
     expect(lib.returnsTrue()).toBe(true);
     expect(lib.__esModule).toBe(true); // test that ESM -> CJS interop was output
 
@@ -129,6 +131,6 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   afterAll(() => {
-    util.teardownStage(stageName);
+    // util.teardownStage(stageName);
   });
 });

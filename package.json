@@ -66,6 +66,7 @@
     "babel-plugin-transform-rename-import": "^2.3.0",
     "camelcase": "^6.0.0",
     "chalk": "^4.0.0",
+    "create-require": "^1.0.2",
     "enquirer": "^2.3.4",
     "eslint": "^6.1.0",
     "eslint-config-prettier": "^6.0.0",
