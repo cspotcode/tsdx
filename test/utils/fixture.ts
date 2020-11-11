@@ -27,7 +27,10 @@ export function setupStageWithFixture(
   if (getPackageManager() === 'yarn2') {
     // Tell yarn to run yarn2 & treat this directory as project root
     fs.writeFileSync('yarn.lock', '');
-    fs.writeFileSync('.yarnrc.yml', 'yarnPath: ../.yarn/releases/yarn-sources.cjs');
+    fs.writeFileSync(
+      '.yarnrc.yml',
+      'yarnPath: ../.yarn/releases/yarn-sources.cjs'
+    );
     shell.exec(`yarn`);
   }
 }
