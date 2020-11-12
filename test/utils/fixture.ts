@@ -30,7 +30,7 @@ export function setupStageWithFixture(
     fs.writeFileSync(
       '.yarnrc.yml',
       'yarnPath: ../yarn2-boilerplate/.yarn/releases/yarn-sources.cjs\n' +
-      'cacheFolder: "../.yarn/stage-cache"\n'
+        'cacheFolder: "../.yarn/stage-cache"\n'
     );
     shell.exec(`yarn`);
   }
