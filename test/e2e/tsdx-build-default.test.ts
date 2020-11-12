@@ -10,7 +10,8 @@ shell.config.silent = false;
 const testDir = 'e2e';
 const fixtureName = 'build-default';
 const stageName = `stage-${fixtureName}`;
-const tsdxBin = util.getPackageManager() === 'yarn2' ? 'yarn tsdx' : 'node ../dist/index.js';
+const tsdxBin =
+  util.getPackageManager() === 'yarn2' ? 'yarn tsdx' : 'node ../dist/index.js';
 
 describe('tsdx build :: zero-config defaults', () => {
   beforeAll(() => {
@@ -47,9 +48,9 @@ describe('tsdx build :: zero-config defaults', () => {
   it('should create the library correctly', async () => {
     const output = execWithCache(`${tsdxBin} build`);
 
-    // const api = require('module').findPnpApi(path.resolve(__dirname, `../../${stageName}/file.js`));
-    // console.log(api.getDependencyTreeRoots());
-    const req = createRequire(path.resolve(__dirname, `../../${stageName}/file.js`));
+    const req = createRequire(
+      path.resolve(__dirname, `../../${stageName}/file.js`)
+    );
     const lib = req('./dist');
     expect(lib.returnsTrue()).toBe(true);
     expect(lib.__esModule).toBe(true); // test that ESM -> CJS interop was output
