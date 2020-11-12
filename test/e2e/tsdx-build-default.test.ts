@@ -10,6 +10,7 @@ shell.config.silent = false;
 const testDir = 'e2e';
 const fixtureName = 'build-default';
 const stageName = `stage-${fixtureName}`;
+const tsdxBin = util.getPackageManager() === 'yarn2' ? 'yarn tsdx' : 'node ../dist/index.js';
 
 describe('tsdx build :: zero-config defaults', () => {
   beforeAll(() => {
@@ -18,7 +19,7 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   it('should compile files into a dist directory', () => {
-    const output = execWithCache('node ../dist/index.js build');
+    const output = execWithCache(`${tsdxBin} build`);
 
     expect(shell.test('-f', 'dist/index.js')).toBeTruthy();
     expect(
@@ -35,7 +36,7 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   it("shouldn't compile files in test/ or types/", () => {
-    const output = execWithCache('node ../dist/index.js build');
+    const output = execWithCache(`${tsdxBin} build`);
 
     expect(shell.test('-d', 'dist/test/')).toBeFalsy();
     expect(shell.test('-d', 'dist/types/')).toBeFalsy();
@@ -44,11 +45,12 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   it('should create the library correctly', async () => {
-    const output = execWithCache('node ../dist/index.js build');
+    const output = execWithCache(`${tsdxBin} build`);
 
-    const lib = createRequire(path.resolve(__dirname, `../../${stageName}`))(
-      './dist'
-    );
+    // const api = require('module').findPnpApi(path.resolve(__dirname, `../../${stageName}/file.js`));
+    // console.log(api.getDependencyTreeRoots());
+    const req = createRequire(path.resolve(__dirname, `../../${stageName}/file.js`));
+    const lib = req('./dist');
     expect(lib.returnsTrue()).toBe(true);
     expect(lib.__esModule).toBe(true); // test that ESM -> CJS interop was output
 
@@ -63,7 +65,7 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   it('should bundle regeneratorRuntime', () => {
-    const output = execWithCache('node ../dist/index.js build');
+    const output = execWithCache(`${tsdxBin} build`);
     expect(output.code).toBe(0);
 
     const matched = grep(/regeneratorRuntime = r/, ['dist/build-default.*.js']);
@@ -71,7 +73,7 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   it('should use lodash for the CJS build', () => {
-    const output = execWithCache('node ../dist/index.js build');
+    const output = execWithCache(`${tsdxBin} build`);
     expect(output.code).toBe(0);
 
     const matched = grep(/lodash/, ['dist/build-default.cjs.*.js']);
@@ -79,7 +81,7 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   it('should use lodash-es for the ESM build', () => {
-    const output = execWithCache('node ../dist/index.js build');
+    const output = execWithCache(`${tsdxBin} build`);
     expect(output.code).toBe(0);
 
     const matched = grep(/lodash-es/, ['dist/build-default.esm.js']);
@@ -87,7 +89,7 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   it("shouldn't replace lodash/fp", () => {
-    const output = execWithCache('node ../dist/index.js build');
+    const output = execWithCache(`${tsdxBin} build`);
     expect(output.code).toBe(0);
 
     const matched = grep(/lodash\/fp/, ['dist/build-default.*.js']);
@@ -95,14 +97,14 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   it('should clean the dist directory before rebuilding', () => {
-    let output = execWithCache('node ../dist/index.js build');
+    let output = execWithCache(`${tsdxBin} build`);
     expect(output.code).toBe(0);
 
     shell.mv('package.json', 'package-og.json');
     shell.mv('package2.json', 'package.json');
 
     // cache bust because we want to re-run this command with new package.json
-    output = execWithCache('node ../dist/index.js build', { noCache: true });
+    output = execWithCache(`${tsdxBin} build`, { noCache: true });
     expect(shell.test('-f', 'dist/index.js')).toBeTruthy();
 
     // build-default files have been cleaned out
@@ -133,6 +135,6 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   afterAll(() => {
-    // util.teardownStage(stageName);
+    util.teardownStage(stageName);
   });
 });

@@ -8,20 +8,14 @@ export function createJestConfig(
   _: (relativePath: string) => void,
   rootDir: string
 ): JestConfigOptions {
-  function resolveRelativeTo(dir: string, moduleSpecifier: string) {
-    const req = createRequire(dir);
+  function resolveRelativeTo(file: string, moduleSpecifier: string) {
+    const req = createRequire(file);
     try {
       return req.resolve(moduleSpecifier);
     } catch {
       return null;
     }
   }
-  // Temporary hack while this PR is in proof-of-concept phase:
-  // Do not attempt `createRequire` if running old node which does not have it.
-  // If `createRequire` is necessary in final implementation,
-  // we can copy paste a backwards-compatible implementation from here:
-  // https://github.com/TypeStrong/ts-node/blob/48fc3903b11921339ea98787ed2d99753e684fd2/src/index.ts#L1219-L1226
-  // https://github.com/TypeStrong/ts-node/blob/master/dist-raw/node-createrequire.js
   function resolveBabelJest() {
     const jestLocation =
       resolveRelativeTo(path.join(rootDir, 'file.js'), 'jest') ||
@@ -32,7 +26,7 @@ export function createJestConfig(
       'jest-config'
     )!;
     return (
-      resolveRelativeTo(rootDir, 'babel-jest') ||
+      resolveRelativeTo(path.join(rootDir, 'file.js'), 'babel-jest') ||
       resolveRelativeTo(jestConfigLocation, 'babel-jest')!
     );
   }

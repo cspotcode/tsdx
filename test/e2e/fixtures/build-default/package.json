@@ -5,6 +5,10 @@
   "name": "build-default",
   "license": "MIT",
   "dependencies": {
-    "lodash": "*"
+    "lodash": "4",
+    "@types/lodash": "*",
+    "@types/node": "*",
+    "regenerator-runtime": "*",
+    "tsdx": "portal:.."
   }
 }

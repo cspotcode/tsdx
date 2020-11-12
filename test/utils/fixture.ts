@@ -29,7 +29,8 @@ export function setupStageWithFixture(
     fs.writeFileSync('yarn.lock', '');
     fs.writeFileSync(
       '.yarnrc.yml',
-      'yarnPath: ../.yarn/releases/yarn-sources.cjs'
+      'yarnPath: ../yarn2-boilerplate/.yarn/releases/yarn-sources.cjs\n' +
+      'cacheFolder: "../.yarn/stage-cache"\n'
     );
     shell.exec(`yarn`);
   }
@@ -40,7 +41,7 @@ export function teardownStage(stageName: string): void {
   shell.rm('-rf', path.join(rootDir, stageName));
 }
 
-function getPackageManager() {
+export function getPackageManager() {
   if (process.env.TSDX_TEST_PACKAGE_MANAGER === 'yarn2') return 'yarn2';
   return 'npm';
 }
