@@ -37,7 +37,7 @@ export function setupStageWithFixture(
       `yarnPath: ${path.join(
         rootDir,
         'yarn2-boilerplate/.yarn/releases/yarn-sources.cjs'
-      )}\ncacheFolder: ${path.join(rootDir, '.yarn/stage-cache')}\n`
+      )}\n`
     );
     shell.exec(`yarn`);
     shell.exec(`yarn add tsdx@portal:${rootDir}`);
