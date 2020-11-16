@@ -48,12 +48,13 @@ describe('tsdx build :: zero-config defaults', () => {
   it('should create the library correctly', async () => {
     const output = execWithCache(`${tsdxBin} build`);
 
-    let req = require;
     if (util.getPackageManager() === 'yarn2') {
       // register stage directory into PnP resolver
       require('module').findPnpApi(util.getStagePath(stageName));
-      req = createRequire(path.join(util.getStagePath(stageName), 'file.js'));
     }
+    const req = createRequire(
+      path.join(util.getStagePath(stageName), 'file.js')
+    );
     const lib = req('./dist');
     expect(lib.returnsTrue()).toBe(true);
     expect(lib.__esModule).toBe(true); // test that ESM -> CJS interop was output
