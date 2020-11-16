@@ -49,7 +49,7 @@ jobs:
         uses: bahmutov/npm-install@v1
 
       - name: Switch to yarn2 before testing
-        run: npx rimraf -r node_modules && cp -r ./yarn2-boilerplate/.yarnrc.yml ./yarn2-boilerplate/.yarn ./ && yarn
+        run: npx shx rm -r node_modules && npx shx cp -r ./yarn2-boilerplate/.yarnrc.yml ./yarn2-boilerplate/.yarn ./ && yarn
         if: ${{ matrix.package_manager == 'yarn2' }}
         env:
           TSDX_TEST_PACKAGE_MANAGER: ${{ matrix.package_manager }}
