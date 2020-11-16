@@ -2,15 +2,15 @@
 set -euxo pipefail
 
 # Delete all yarn2 boilerplate and reset yarn.lock to master
-rm -r .yarnrc.yml .yarn stage-* || true
+rm -r .yarnrc.yml .yarn node_modules || true
 git checkout origin/master -- yarn.lock
 yarn --version
 
 # Build tsdx with yarn 1, which matches tsdx's current build process on CI
 yarn
-yarn build
 
 # Switch to yarn 2 so that running tsdx *and* running stage builds happens in PNP
+# Necessary so that jest's node processes have PnP and can require() stage builds
 cp -r ./yarn2-boilerplate/.yarn ./yarn2-boilerplate/.yarnrc.yml ./
 yarn
 
