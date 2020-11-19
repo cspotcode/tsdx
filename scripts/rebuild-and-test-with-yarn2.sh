@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euxo pipefail
 
+###
+# TODO do not merge this file.  Delete this file before requesting a review of this pull request.
+###
+
 # Delete all yarn2 boilerplate and reset yarn.lock to master
 # rm -r .yarnrc.yml .yarn node_modules || true
 rm -r node_modules || true
