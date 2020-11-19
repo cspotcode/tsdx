@@ -55,7 +55,7 @@ jobs:
           path: |
             test/yarn2/.yarn/cache
             test/yarn2/yarn.lock
-          key: ${{ runner.os }}
+          key: ''
 
       - name: Prepare yarn2 cache and seed lockfile
         if: ${{ matrix.package_manager == 'yarn2' }}
