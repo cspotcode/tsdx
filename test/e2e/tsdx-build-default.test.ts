@@ -1,6 +1,4 @@
 import * as shell from 'shelljs';
-import createRequire from 'create-require';
-import * as path from 'path';
 
 import * as util from '../utils/fixture';
 import { execWithCache, grep } from '../utils/shell';
@@ -10,8 +8,6 @@ shell.config.silent = false;
 const testDir = 'e2e';
 const fixtureName = 'build-default';
 const stageName = `stage-${fixtureName}`;
-const tsdxBin =
-  util.getPackageManager() === 'yarn2' ? 'yarn tsdx' : 'node ../dist/index.js';
 
 describe('tsdx build :: zero-config defaults', () => {
   beforeAll(() => {
@@ -20,7 +16,7 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   it('should compile files into a dist directory', () => {
-    const output = execWithCache(`${tsdxBin} build`);
+    const output = execWithCache(`${util.tsdxBin} build`);
 
     expect(shell.test('-f', 'dist/index.js')).toBeTruthy();
     expect(
@@ -37,7 +33,7 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   it("shouldn't compile files in test/ or types/", () => {
-    const output = execWithCache(`${tsdxBin} build`);
+    const output = execWithCache(`${util.tsdxBin} build`);
 
     expect(shell.test('-d', 'dist/test/')).toBeFalsy();
     expect(shell.test('-d', 'dist/types/')).toBeFalsy();
@@ -46,31 +42,24 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   it('should create the library correctly', async () => {
-    const output = execWithCache(`${tsdxBin} build`);
+    const output = execWithCache(`${util.tsdxBin} build`);
 
-    if (util.getPackageManager() === 'yarn2') {
-      // register stage directory into PnP resolver
-      require('module').findPnpApi(util.getStagePath(stageName));
-    }
-    const req = createRequire(
-      path.join(util.getStagePath(stageName), 'file.js')
-    );
-    const lib = req('./dist');
-    expect(lib.returnsTrue()).toBe(true);
-    expect(lib.__esModule).toBe(true); // test that ESM -> CJS interop was output
+    const { evaluate } = util.getLibTester('./dist');
+    expect(evaluate('lib.returnsTrue()')).toBe(true);
+    expect(evaluate('lib.__esModule')).toBe(true); // test that ESM -> CJS interop was output
 
     // syntax tests
-    expect(lib.testNullishCoalescing()).toBe(true);
-    expect(lib.testOptionalChaining()).toBe(true);
+    expect(evaluate('lib.testNullishCoalescing()')).toBe(true);
+    expect(evaluate('lib.testOptionalChaining()')).toBe(true);
     // can't use an async generator in Jest yet, so use next().value instead of yield
-    expect(lib.testGenerator().next().value).toBe(true);
-    expect(await lib.testAsync()).toBe(true);
+    expect(evaluate('lib.testGenerator().next().value')).toBe(true);
+    expect(evaluate('await lib.testAsync()')).toBe(true);
 
     expect(output.code).toBe(0);
   });
 
   it('should bundle regeneratorRuntime', () => {
-    const output = execWithCache(`${tsdxBin} build`);
+    const output = execWithCache(`${util.tsdxBin} build`);
     expect(output.code).toBe(0);
 
     const matched = grep(/regeneratorRuntime = r/, ['dist/build-default.*.js']);
@@ -78,7 +67,7 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   it('should use lodash for the CJS build', () => {
-    const output = execWithCache(`${tsdxBin} build`);
+    const output = execWithCache(`${util.tsdxBin} build`);
     expect(output.code).toBe(0);
 
     const matched = grep(/lodash/, ['dist/build-default.cjs.*.js']);
@@ -86,7 +75,7 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   it('should use lodash-es for the ESM build', () => {
-    const output = execWithCache(`${tsdxBin} build`);
+    const output = execWithCache(`${util.tsdxBin} build`);
     expect(output.code).toBe(0);
 
     const matched = grep(/lodash-es/, ['dist/build-default.esm.js']);
@@ -94,7 +83,7 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   it("shouldn't replace lodash/fp", () => {
-    const output = execWithCache(`${tsdxBin} build`);
+    const output = execWithCache(`${util.tsdxBin} build`);
     expect(output.code).toBe(0);
 
     const matched = grep(/lodash\/fp/, ['dist/build-default.*.js']);
@@ -102,14 +91,15 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   it('should clean the dist directory before rebuilding', () => {
-    let output = execWithCache(`${tsdxBin} build`);
+    let output = execWithCache(`${util.tsdxBin} build`);
     expect(output.code).toBe(0);
 
     shell.mv('package.json', 'package-og.json');
     shell.mv('package2.json', 'package.json');
 
     // cache bust because we want to re-run this command with new package.json
-    output = execWithCache(`${tsdxBin} build`, { noCache: true });
+    util.packageManagerInstall();
+    output = execWithCache(`${util.tsdxBin} build`, { noCache: true });
     expect(shell.test('-f', 'dist/index.js')).toBeTruthy();
 
     // build-default files have been cleaned out

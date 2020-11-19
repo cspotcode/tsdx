@@ -3,5 +3,8 @@
     "build": "tsdx build"
   },
   "name": "build-withtsconfig",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "14.14.7"
+  }
 }

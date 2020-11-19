@@ -2,12 +2,17 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as shell from 'shelljs';
 import * as os from 'os';
+import * as libTester from './lib-tester';
 
 export const rootDir = process.cwd();
 export const stageRootDir =
   getPackageManager() === 'yarn2'
     ? path.join(os.tmpdir(), 'tsdx-test-stages')
     : rootDir;
+export const tsdxBin =
+  getPackageManager() === 'yarn2'
+    ? 'yarn tsdx'
+    : `node ${rootDir}/dist/index.js`;
 
 shell.config.silent = true;
 
@@ -31,16 +36,28 @@ export function setupStageWithFixture(
   shell.cd(stagePath);
   if (getPackageManager() === 'yarn2') {
     // Setup stage directory as a project root for yarn2
-    fs.writeFileSync('yarn.lock', '');
     fs.writeFileSync(
       '.yarnrc.yml',
       `yarnPath: ${path.join(
         rootDir,
-        'yarn2-boilerplate/.yarn/releases/yarn-sources.cjs'
-      )}\n`
+        'test/yarn2/.yarn/releases/yarn-sources.cjs'
+      )}\ncacheFolder: ${rootDir}/test/yarn2/.yarn/cache`
     );
-    shell.exec(`yarn`);
-    shell.exec(`yarn add tsdx@portal:${rootDir}`);
+    // Copy seed lockfile with most resolutions already performed.  Makes tests faster.
+    shell.exec(`cp ${rootDir}/test/yarn2/yarn.lock ${stagePath}/`);
+  }
+  packageManagerInstall();
+}
+
+export function packageManagerInstall() {
+  if (getPackageManager() === 'yarn2') {
+    // Add tsdx dependency pointed to project directory
+    const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+    pkg.dependencies = pkg.dependencies ?? {};
+    pkg.dependencies['tsdx'] = `portal:${rootDir}`;
+    fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+    const { code } = shell.exec(`yarn`);
+    if (code !== 0) throw new Error('yarn install failed');
   }
 }
 
@@ -56,4 +73,21 @@ export function getPackageManager() {
 
 export function getStagePath(stageName: string) {
   return path.join(stageRootDir, stageName);
+}
+
+export function getLibTester(libPath: string) {
+  const absLibPath = path.resolve(libPath);
+  function evaluate(expression: string): any {
+    const isYarn2 = getPackageManager() === 'yarn2';
+    const libTesterPath = require.resolve('./lib-tester.js');
+    const args: libTester.JsonArgs = { libPath: absLibPath, expression };
+    const encodedValue = shell.exec(
+      `${isYarn2 ? 'yarn ' : ''}node ${libTesterPath} ${Buffer.from(
+        JSON.stringify(args)
+      ).toString('base64')}`
+    );
+    if (encodedValue.trim() === 'undefined') return undefined;
+    return JSON.parse(encodedValue);
+  }
+  return { evaluate };
 }

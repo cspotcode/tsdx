@@ -48,8 +48,8 @@ jobs:
       - name: Install deps and build (with cache)
         uses: bahmutov/npm-install@v1
 
-      - name: Switch to yarn2 before testing
-        run: npx shx rm -rf node_modules && npx shx cp -r ./yarn2-boilerplate/.yarnrc.yml ./yarn2-boilerplate/.yarn ./ && yarn
+      - name: Prepare yarn2 cache and seed lockfile
+        run: cd test/yarn2 && yarn
         if: ${{ matrix.package_manager == 'yarn2' }}
         env:
           TSDX_TEST_PACKAGE_MANAGER: ${{ matrix.package_manager }}

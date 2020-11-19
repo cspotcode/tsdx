@@ -10,3 +10,6 @@ package-lock.json
 /.yarn
 /.yarnrc.yml
 /.pnp.js
+/test/yarn2/.pnp.js
+/test/yarn2/yarn.lock
+/test/yarn2/.yarn

@@ -16,7 +16,7 @@ describe('integration :: tsdx build :: options', () => {
   });
 
   it('should create errors/ dir with --extractErrors', () => {
-    const output = execWithCache('node ../dist/index.js build --extractErrors');
+    const output = execWithCache(`${util.tsdxBin} build --extractErrors`);
 
     expect(shell.test('-f', 'errors/ErrorDev.js')).toBeTruthy();
     expect(shell.test('-f', 'errors/ErrorProd.js')).toBeTruthy();
@@ -26,9 +26,9 @@ describe('integration :: tsdx build :: options', () => {
   });
 
   it('should have correct errors/codes.json', () => {
-    const output = execWithCache('node ../dist/index.js build --extractErrors');
+    const output = execWithCache(`${util.tsdxBin} build --extractErrors`);
 
-    const errors = require(`../../${stageName}/errors/codes.json`);
+    const errors = require(`${util.getStagePath(stageName)}/errors/codes.json`);
     expect(errors['0']).toBe('error occurred! o no');
     // TODO: warning is actually not extracted, only invariant
     // expect(errors['1']).toBe('warning - water is wet');
@@ -37,7 +37,7 @@ describe('integration :: tsdx build :: options', () => {
   });
 
   it('should compile files into a dist directory', () => {
-    const output = execWithCache('node ../dist/index.js build --extractErrors');
+    const output = execWithCache(`${util.tsdxBin} build --extractErrors`);
 
     expect(shell.test('-f', 'dist/index.js')).toBeTruthy();
     expect(
