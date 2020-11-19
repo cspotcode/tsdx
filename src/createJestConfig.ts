@@ -1,5 +1,5 @@
 import { Config } from '@jest/types';
-import * as path from 'path';
+import path from 'path';
 import createRequire from 'create-require';
 
 export type JestConfigOptions = Partial<Config.InitialOptions>;
