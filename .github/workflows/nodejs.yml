@@ -48,9 +48,17 @@ jobs:
       - name: Install deps and build (with cache)
         uses: bahmutov/npm-install@v1
 
-      - name: Prepare yarn2 cache and seed lockfile
-        run: cd test/yarn2 && touch yarn.lock && yarn
+      - name: Restore yarn2 cache
         if: ${{ matrix.package_manager == 'yarn2' }}
+        uses: actions/cache@v2
+        with:
+          path: |
+            test/yarn2/.yarn/cache
+            test/yarn2/yarn.lock
+
+      - name: Prepare yarn2 cache and seed lockfile
+        if: ${{ matrix.package_manager == 'yarn2' }}
+        run: cd test/yarn2 && touch yarn.lock && yarn
         env:
           TSDX_TEST_PACKAGE_MANAGER: ${{ matrix.package_manager }}
 
