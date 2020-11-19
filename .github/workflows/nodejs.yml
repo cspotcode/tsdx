@@ -49,7 +49,7 @@ jobs:
         uses: bahmutov/npm-install@v1
 
       - name: Prepare yarn2 cache and seed lockfile
-        run: cd test/yarn2 && yarn
+        run: cd test/yarn2 && touch yarn.lock && yarn
         if: ${{ matrix.package_manager == 'yarn2' }}
         env:
           TSDX_TEST_PACKAGE_MANAGER: ${{ matrix.package_manager }}
