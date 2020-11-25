@@ -20,7 +20,7 @@ yarn
 popd
 
 # Run tests
-TSDX_TEST_PACKAGE_MANAGER=yarn2 yarn test:post-build
+SHOULD_USE_YARN2=true yarn test:post-build
 
 ##############################
 
@@ -43,10 +43,10 @@ TSDX_TEST_PACKAGE_MANAGER=yarn2 yarn test:post-build
 #     fi
 # done
 
-# TSDX_TEST_PACKAGE_MANAGER=yarn2 yarn test:post-build ./test/e2e/tsdx-build-default.test.ts
-# TSDX_TEST_PACKAGE_MANAGER=yarn2 yarn test:post-build ./test/e2e/tsdx-build-withTsconfig.test
-# TSDX_TEST_PACKAGE_MANAGER=yarn2 yarn test:post-build ./test/integration/tsdx-build-withConfig.test
+# SHOULD_USE_YARN2=true yarn test:post-build ./test/e2e/tsdx-build-default.test.ts
+# SHOULD_USE_YARN2=true yarn test:post-build ./test/e2e/tsdx-build-withTsconfig.test
+# SHOULD_USE_YARN2=true yarn test:post-build ./test/integration/tsdx-build-withConfig.test
 # for file in ./test/**/*.test.ts ; do
-#     TSDX_TEST_PACKAGE_MANAGER=yarn2 yarn test:post-build "$file"
+#     SHOULD_USE_YARN2=true yarn test:post-build "$file"
 # done
-# TSDX_TEST_PACKAGE_MANAGER=yarn2 yarn test:post-build --maxWorkers=1
+# SHOULD_USE_YARN2=true yarn test:post-build --maxWorkers=1

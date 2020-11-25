@@ -28,14 +28,14 @@ jobs:
         run: yarn deduplicate:check
 
   test:
-    name: Test on Node ${{ matrix.node }} and ${{ matrix.os }} using ${{ matrix.package_manager }}
+    name: Test on Node ${{ matrix.node }} and ${{ matrix.os }}, yarn2?:${{ matrix.should_use_yarn2 }}
 
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         node: ['10.x', '12.x', '14.x']
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        package_manager: [npm, yarn2]
+        should_use_yarn2: [false, true]
 
     steps:
       - name: Checkout repo
@@ -49,7 +49,7 @@ jobs:
         uses: bahmutov/npm-install@v1
 
       - name: Restore yarn2 cache
-        if: ${{ matrix.package_manager == 'yarn2' }}
+        if: ${{ matrix.should_use_yarn2 }}
         uses: actions/cache@v2
         with:
           path: |
@@ -58,12 +58,10 @@ jobs:
           key: cache-key
 
       - name: Prepare yarn2 cache and seed lockfile
-        if: ${{ matrix.package_manager == 'yarn2' }}
+        if: ${{ matrix.should_use_yarn2 }}
         run: cd test/yarn2 && touch yarn.lock && yarn
-        env:
-          TSDX_TEST_PACKAGE_MANAGER: ${{ matrix.package_manager }}
 
       - name: Test package
         run: yarn test:post-build
         env:
-          TSDX_TEST_PACKAGE_MANAGER: ${{ matrix.package_manager }}
+          SHOULD_USE_YARN2: ${{ matrix.should_use_yarn2 }}

@@ -5,14 +5,12 @@ import * as os from 'os';
 import * as libTester from './lib-tester';
 
 export const rootDir = process.cwd();
-export const stageRootDir =
-  getPackageManager() === 'yarn2'
-    ? path.join(os.tmpdir(), 'tsdx-test-stages')
-    : rootDir;
-export const tsdxBin =
-  getPackageManager() === 'yarn2'
-    ? 'yarn tsdx'
-    : `node ${rootDir}/dist/index.js`;
+export const stageRootDir = isYarn2()
+  ? path.join(os.tmpdir(), 'tsdx-test-stages')
+  : rootDir;
+export const tsdxBin = isYarn2()
+  ? 'yarn tsdx'
+  : `node ${rootDir}/dist/index.js`;
 
 shell.config.silent = true;
 
@@ -26,7 +24,7 @@ export function setupStageWithFixture(
   shell.exec(
     `cp -a ${rootDir}/test/${testDir}/fixtures/${fixtureName}/. ${stagePath}/`
   );
-  if (getPackageManager() === 'npm') {
+  if (!isYarn2()) {
     shell.ln(
       '-s',
       path.join(rootDir, 'node_modules'),
@@ -34,7 +32,7 @@ export function setupStageWithFixture(
     );
   }
   shell.cd(stagePath);
-  if (getPackageManager() === 'yarn2') {
+  if (isYarn2()) {
     // Setup stage directory as a project root for yarn2
     fs.writeFileSync(
       '.yarnrc.yml',
@@ -50,15 +48,15 @@ export function setupStageWithFixture(
 }
 
 export function packageManagerInstall() {
-  if (getPackageManager() === 'yarn2') {
-    // Add tsdx dependency pointed to project directory
-    const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-    pkg.dependencies = pkg.dependencies ?? {};
-    pkg.dependencies['tsdx'] = `portal:${rootDir}`;
-    fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
-    const { code } = shell.exec(`yarn`);
-    if (code !== 0) throw new Error('yarn install failed');
-  }
+  if (!isYarn2()) return;
+
+  // Add tsdx dependency pointed to project directory
+  const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+  pkg.dependencies = pkg.dependencies ?? {};
+  pkg.dependencies['tsdx'] = `portal:${rootDir}`;
+  fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+  const { code } = shell.exec(`yarn`);
+  if (code !== 0) throw new Error('yarn install failed');
 }
 
 export function teardownStage(stageName: string): void {
@@ -66,9 +64,8 @@ export function teardownStage(stageName: string): void {
   shell.rm('-rf', getStagePath(stageName));
 }
 
-export function getPackageManager() {
-  if (process.env.TSDX_TEST_PACKAGE_MANAGER === 'yarn2') return 'yarn2';
-  return 'npm';
+export function isYarn2() {
+  return process.env.SHOULD_USE_YARN2 === 'true';
 }
 
 export function getStagePath(stageName: string) {
@@ -78,11 +75,10 @@ export function getStagePath(stageName: string) {
 export function getLibTester(libPath: string) {
   const absLibPath = path.resolve(libPath);
   function evaluate(expression: string): any {
-    const isYarn2 = getPackageManager() === 'yarn2';
     const libTesterPath = require.resolve('./lib-tester.js');
     const args: libTester.JsonArgs = { libPath: absLibPath, expression };
     const encodedValue = shell.exec(
-      `${isYarn2 ? 'yarn ' : ''}node ${libTesterPath} ${Buffer.from(
+      `${isYarn2() ? 'yarn ' : ''}node ${libTesterPath} ${Buffer.from(
         JSON.stringify(args)
       ).toString('base64')}`
     );
