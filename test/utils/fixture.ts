@@ -65,7 +65,8 @@ export function teardownStage(stageName: string): void {
 }
 
 export function isYarn2() {
-  return process.env.SHOULD_USE_YARN2 === 'true';
+  // return process.env.SHOULD_USE_YARN2 === 'true';
+  return !!process.versions.pnp;
 }
 
 export function getStagePath(stageName: string) {
