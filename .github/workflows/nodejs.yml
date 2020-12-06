@@ -61,12 +61,11 @@ jobs:
             test/yarn2/yarn.lock
           key: cache-key
 
-      - name: Fix manifests for yarn2
+      - name: Setup for yarn2
         if: ${{ matrix.should_use_yarn2 }}
         run: |
           echo 'yarnPath: .yarn/releases/yarn-sources.cjs' >> .yarnrc.yml && yarn && yarn node ./test/utils/prepare-for-yarn2.js && yarn && yarn --version
 
       - name: Test package
-        run: yarn test:post-build
-        env:
-          SHOULD_USE_YARN2: ${{ matrix.should_use_yarn2 }}
+        run: |
+          yarn --version && yarn node -p 'process.versions.pnp' && yarn test:post-build
