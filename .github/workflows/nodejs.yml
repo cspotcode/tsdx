@@ -64,7 +64,7 @@ jobs:
       - name: Fix manifests for yarn2
         if: ${{ matrix.should_use_yarn2 }}
         run: |
-          echo 'yarnPath: .yarn/releases/yarn-sources.cjs' >> .yarnrc.yml && yarn && yarn node ./test/utils/prepare-for-yarn2.js && yarn
+          echo 'yarnPath: .yarn/releases/yarn-sources.cjs' >> .yarnrc.yml && yarn && yarn node ./test/utils/prepare-for-yarn2.js && yarn && yarn --version
 
       - name: Test package
         run: yarn test:post-build
