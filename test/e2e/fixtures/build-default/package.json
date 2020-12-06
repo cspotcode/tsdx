@@ -3,11 +3,5 @@
     "build": "tsdx build"
   },
   "name": "build-default",
-  "license": "MIT",
-  "dependencies": {
-    "@types/lodash": "4.14.165",
-    "@types/node": "14.14.7",
-    "lodash": "4.17.20",
-    "regenerator-runtime": "0.13.7"
-  }
+  "license": "MIT"
 }

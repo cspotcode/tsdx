@@ -16,7 +16,7 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   it('should compile files into a dist directory', () => {
-    const output = execWithCache(`${util.tsdxBin} build`);
+    const output = execWithCache('node ../dist/index.js build');
 
     expect(shell.test('-f', 'dist/index.js')).toBeTruthy();
     expect(
@@ -33,7 +33,7 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   it("shouldn't compile files in test/ or types/", () => {
-    const output = execWithCache(`${util.tsdxBin} build`);
+    const output = execWithCache('node ../dist/index.js build');
 
     expect(shell.test('-d', 'dist/test/')).toBeFalsy();
     expect(shell.test('-d', 'dist/types/')).toBeFalsy();
@@ -42,24 +42,24 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   it('should create the library correctly', async () => {
-    const output = execWithCache(`${util.tsdxBin} build`);
+    const output = execWithCache('node ../dist/index.js build');
 
-    const { evaluate } = util.getLibTester('./dist');
-    expect(evaluate('lib.returnsTrue()')).toBe(true);
-    expect(evaluate('lib.__esModule')).toBe(true); // test that ESM -> CJS interop was output
+    const lib = require(`../../${stageName}/dist`);
+    expect(lib.returnsTrue()).toBe(true);
+    expect(lib.__esModule).toBe(true); // test that ESM -> CJS interop was output
 
     // syntax tests
-    expect(evaluate('lib.testNullishCoalescing()')).toBe(true);
-    expect(evaluate('lib.testOptionalChaining()')).toBe(true);
+    expect(lib.testNullishCoalescing()).toBe(true);
+    expect(lib.testOptionalChaining()).toBe(true);
     // can't use an async generator in Jest yet, so use next().value instead of yield
-    expect(evaluate('lib.testGenerator().next().value')).toBe(true);
-    expect(evaluate('await lib.testAsync()')).toBe(true);
+    expect(lib.testGenerator().next().value).toBe(true);
+    expect(await lib.testAsync()).toBe(true);
 
     expect(output.code).toBe(0);
   });
 
   it('should bundle regeneratorRuntime', () => {
-    const output = execWithCache(`${util.tsdxBin} build`);
+    const output = execWithCache('node ../dist/index.js build');
     expect(output.code).toBe(0);
 
     const matched = grep(/regeneratorRuntime = r/, ['dist/build-default.*.js']);
@@ -67,7 +67,7 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   it('should use lodash for the CJS build', () => {
-    const output = execWithCache(`${util.tsdxBin} build`);
+    const output = execWithCache('node ../dist/index.js build');
     expect(output.code).toBe(0);
 
     const matched = grep(/lodash/, ['dist/build-default.cjs.*.js']);
@@ -75,7 +75,7 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   it('should use lodash-es for the ESM build', () => {
-    const output = execWithCache(`${util.tsdxBin} build`);
+    const output = execWithCache('node ../dist/index.js build');
     expect(output.code).toBe(0);
 
     const matched = grep(/lodash-es/, ['dist/build-default.esm.js']);
@@ -83,7 +83,7 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   it("shouldn't replace lodash/fp", () => {
-    const output = execWithCache(`${util.tsdxBin} build`);
+    const output = execWithCache('node ../dist/index.js build');
     expect(output.code).toBe(0);
 
     const matched = grep(/lodash\/fp/, ['dist/build-default.*.js']);
@@ -91,15 +91,14 @@ describe('tsdx build :: zero-config defaults', () => {
   });
 
   it('should clean the dist directory before rebuilding', () => {
-    let output = execWithCache(`${util.tsdxBin} build`);
+    let output = execWithCache('node ../dist/index.js build');
     expect(output.code).toBe(0);
 
     shell.mv('package.json', 'package-og.json');
     shell.mv('package2.json', 'package.json');
 
     // cache bust because we want to re-run this command with new package.json
-    util.packageManagerInstall();
-    output = execWithCache(`${util.tsdxBin} build`, { noCache: true });
+    output = execWithCache('node ../dist/index.js build', { noCache: true });
     expect(shell.test('-f', 'dist/index.js')).toBeTruthy();
 
     // build-default files have been cleaned out

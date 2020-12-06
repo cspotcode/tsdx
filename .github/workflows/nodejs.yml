@@ -61,9 +61,9 @@ jobs:
             test/yarn2/yarn.lock
           key: cache-key
 
-      - name: Prepare yarn2 cache and seed lockfile
+      - name: Fix manifests for yarn2
         if: ${{ matrix.should_use_yarn2 }}
-        run: cd test/yarn2 && touch yarn.lock && yarn
+        run: yarn && yarn node ./test/utils/prepare-for-yarn2.js && yarn
 
       - name: Test package
         run: yarn test:post-build

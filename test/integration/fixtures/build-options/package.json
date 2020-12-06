@@ -3,10 +3,5 @@
     "build": "tsdx build --extractErrors"
   },
   "name": "build-options",
-  "license": "MIT",
-  "dependencies": {
-    "@types/node": "14.14.7",
-    "tiny-invariant": "1.1.0",
-    "tiny-warning": "1.0.3"
-  }
+  "license": "MIT"
 }
