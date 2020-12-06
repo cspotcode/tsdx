@@ -11,7 +11,7 @@ const fs = require('fs-extra');
 const shell = require('shelljs');
 
 shell.cd(__dirname);
-shell.cd('..');
+shell.cd('../..');
 const rootPkg = fs.readJSONSync('package.json');
 // Declare all stages as workspaces so that a single `yarn` invocation resolves them all.
 rootPkg.workspaces = {
