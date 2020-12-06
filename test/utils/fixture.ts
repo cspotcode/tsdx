@@ -19,7 +19,7 @@ export function setupStageWithFixture(
   shell.exec(
     `cp -a ${rootDir}/test/${testDir}/fixtures/${fixtureName}/. ${stagePath}/`
   );
-  if(!isYarn2()) {
+  if (!isYarn2()) {
     shell.ln(
       '-s',
       path.join(rootDir, 'node_modules'),
