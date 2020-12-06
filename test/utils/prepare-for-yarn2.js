@@ -24,12 +24,12 @@ rootPkg.workspaces = {
 fs.writeJSONSync('package.json', rootPkg, {spaces: 2});
 
 // Copy all root dependencies onto each test package.json
-for(const package of [
+for(const pkgPath of [
     shell.ls('test/e2e/fixtures/*/package.json'),
     shell.ls('test/integration/fixtures/*/package.json')
 ].join(',').split(',')) {
-    const pkg = fs.readJSONSync(`./${ package }`);
+    const pkg = fs.readJSONSync(`./${ pkgPath }`);
     pkg.dependencies = Object.assign({}, pkg.dependencies, rootPkg.dependencies);
     pkg.devDependencies = Object.assign({}, pkg.devDependencies, rootPkg.devDependencies);
-    fs.writeJSONSync(package, pkg, {spaces: 2});
+    fs.writeJSONSync(pkgPath, pkg, {spaces: 2});
 }
